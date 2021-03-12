@@ -7,6 +7,8 @@ import datetime
 from xlutils3 import copy
 import xlrd
 
+import traceback, sys
+
 # 初始化表头列表
 tb_head = ['合同签订日期:',
                '供地方式:',
@@ -31,6 +33,7 @@ tb_head = ['合同签订日期:',
                 '约定支付金额',
                 '下限:',
                 '上限:',
+                'adcode'
                ]
 
 def LandChina(EXCEL_NAME):
@@ -42,7 +45,7 @@ def LandChina(EXCEL_NAME):
     start = historyDate.strftime('%Y-%m-%d')
 
     
-    chormedriver='C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
+    chormedriver='chromedriver.exe'
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     #browser是自己定义的
@@ -135,6 +138,7 @@ def LandChina(EXCEL_NAME):
                                         url =tr.find_element_by_tag_name('a').get_attribute('href')
                                         print(tr.find_element_by_class_name('gridTdNumber').text)
                                         new_windows = 'window.open("'+url+'");'
+
                                         browser.execute_script(new_windows)
                                         #隐式等待1min
                                         # browser.implicitly_wait(60)
@@ -154,6 +158,10 @@ def LandChina(EXCEL_NAME):
                                         index = index + 10
                                     else:
                                         tag = 0
+                                        
+                                        # 记录地区编号
+                                        adcode = browser.find_element_by_id("mainModuleContainer_1855_1856_ctl00_ctl00_p1_f1_r1_c2_ctrl_value").get_attribute("value")
+                                        table.write(recordNum, tb_head.index("adcode"), adcode)
                                         #读取表格数据
                                         for row in rowInfo[2:]:
                                             i = 0
